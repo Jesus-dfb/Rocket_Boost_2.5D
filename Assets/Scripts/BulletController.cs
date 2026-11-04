@@ -21,6 +21,11 @@ public class BulletController : MonoBehaviour
     void OnEnable()
     {
         hasHit = false;
+        foreach (ParticleSystem effect in GetComponentsInChildren<ParticleSystem>())
+        {
+            effect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            effect.Play(true);
+        }
         CancelInvoke(nameof(DeactivateBullet));
         Invoke(nameof(DeactivateBullet), bulletLifeTime);
     }
@@ -29,6 +34,8 @@ public class BulletController : MonoBehaviour
     {
         // A previous shot must not deactivate this bullet when the pool reuses it.
         CancelInvoke(nameof(DeactivateBullet));
+        foreach (ParticleSystem effect in GetComponentsInChildren<ParticleSystem>())
+            effect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 
     /// <summary>
