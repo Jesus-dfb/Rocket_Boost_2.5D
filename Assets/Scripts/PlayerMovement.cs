@@ -11,7 +11,7 @@ public class PlayerMovement : MonoBehaviour
     
     [Header("Movement Settings")]
     [SerializeField] private float moveForce = 15f;
-    [SerializeField] private float rotationForce = 2.5f;
+    [SerializeField] private float rotationForce = 4f;
 
     [Header("Particle Systems")]
     [SerializeField] private ParticleSystem thrustParticleSystem;
