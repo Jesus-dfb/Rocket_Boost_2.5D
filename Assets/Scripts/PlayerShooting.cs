@@ -13,6 +13,13 @@ public class PlayerShooting : MonoBehaviour
     [SerializeField] private float bulletRate = 0.25f;
     [SerializeField] private int bulletDamage = 1;
 
+    [Header("Shoot Audio")]
+    [SerializeField] private AudioClip laserClip1;
+    [SerializeField] private AudioClip laserClip2;
+    [SerializeField, Range(0f, 1f)] private float shootingVolume = 0.7f;
+
+    private AudioSource shootingAudioSource;
+
     private Transform bulletSpawnPoint;
     private ObjectPool bulletPool;
 
@@ -27,6 +34,13 @@ public class PlayerShooting : MonoBehaviour
     {
         maxAmmo = Mathf.Max(1, maxAmmo);
         currentAmmo = Mathf.Clamp(currentAmmo, 0, maxAmmo);
+        // Keep shooting separate from the engine audio stopped by PlayerMovement.
+        GameObject audioObject = new GameObject("Shooting Audio");
+        audioObject.transform.SetParent(transform, false);
+        shootingAudioSource = audioObject.AddComponent<AudioSource>();
+        shootingAudioSource.playOnAwake = false;
+        shootingAudioSource.loop = false;
+        shootingAudioSource.spatialBlend = 0f;
     }
 
     /// <summary>Returns true when ammo was restored. Infinite ammo does not consume pickups.</summary>
@@ -40,6 +54,17 @@ public class PlayerShooting : MonoBehaviour
         return true;
     }
 
+    private void PlayRandomShotSound()
+    {
+        AudioClip clip;
+        if (laserClip1 != null && laserClip2 != null)
+            clip = UnityEngine.Random.Range(0, 2) == 0 ? laserClip1 : laserClip2;
+        else
+            clip = laserClip1 != null ? laserClip1 : laserClip2;
+
+        if (clip != null)
+            shootingAudioSource.PlayOneShot(clip, shootingVolume);
+    }
     void Start()
     {
         bulletSpawnPoint = transform.Find("ShootPoint");
@@ -86,8 +111,10 @@ public class PlayerShooting : MonoBehaviour
             //Set the bullet's speed and movement forward
             Rigidbody bulletRigidbody = bullet.GetComponent<Rigidbody>();
             bulletRigidbody.linearVelocity = bulletSpawnPoint.up * bulletSpeed;
+            PlayRandomShotSound();
          
         }
      
     }
 }
+
